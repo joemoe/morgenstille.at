@@ -16,6 +16,10 @@ export default class LandScene extends Phaser.Scene {
 	}
 
 	create() {
+
+	    this.cameras.main.setBounds(0, 0, 2000, 2000);
+	    this.physics.world.setBounds(0, 0, 2000, 2000);
+
 		const goals = this.createGoals();
 		this.player = this.createPlayer();
 
@@ -35,24 +39,33 @@ export default class LandScene extends Phaser.Scene {
 		this.physics.add.collider(this.player, goals, this.collideGoal, null, this);
 		this.cursors = this.input.keyboard.createCursorKeys();
 		this.input.keyboard.on('keydown', this.executeAction, this);
+
+		this.cameras.main.startFollow(this.player);
 	}
 
 	update() {
+		let velX = 0;
+		let velY = 0;
+
 		if(this.cursors.left.isDown) {
-			this.player.setVelocityX(-160);
+			velX = -160;
 		} else if(this.cursors.right.isDown) {
-			this.player.setVelocityX(160);
-		} else {
-			this.player.setVelocityX(0);
+			velX = 160;
 		}
 
 		if(this.cursors.up.isDown) {
-			this.player.setVelocityY(-160);
+			velY = -160;
 		} else if(this.cursors.down.isDown) {
-			this.player.setVelocityY(160);
-		} else {
-			this.player.setVelocityY(0);
+			velY = 160;
 		}
+
+		if(velX != 0 && velY != 0) {
+			let sped = Math.sqrt(velX * velX + velY * velY);
+			velX = velX / sped * 160;
+			velY = velY / sped * 160;
+		}
+
+		this.player.setVelocity(velX, velY)
 
 		if(false && !this.player.isColliding) {
 			this.hideTitlebar();
@@ -63,18 +76,47 @@ export default class LandScene extends Phaser.Scene {
 	createGoals() {
 		const goals = this.physics.add.staticGroup();
 
-		const moser = goals.create(200, 100, 'goal');
+		const moser = goals.create(400, 400, 'goal');
 		moser.setData('type', 'link');
 		moser.setData('title', 'Father & Son');
 		moser.setData('link', 'https://moser.wtf');
+		moser.setRotation(1);
 		moser.body.setCircle(50);
 		
-		const joemoe = goals.create(300, 300, 'goal');
+		const joemoe = goals.create(1600, 300, 'goal');
 		joemoe.setData('type', 'link');
 		joemoe.setData('title', 'Me is Joemoe');
 		joemoe.setData('link', 'https://joemoe.at');
-		joemoe.body.rotation = 284;
+		joemoe.setRotation(2);
 		joemoe.body.setCircle(50);
+
+		const crate = goals.create(800, 700, 'goal');
+		crate.setData('type', 'link');
+		crate.setData('title', 'Managing products at Crate.io');
+		crate.setData('link', 'https://crate.io');
+		crate.body.setCircle(50);
+		crate.setRotation(3);
+
+		const insta = goals.create(1700, 800, 'goal');
+		insta.setData('type', 'link');
+		insta.setData('title', 'Impressions of a live // IG');
+		insta.setData('link', 'https://instagram.com/joemoe');
+		insta.body.setCircle(50);
+		insta.setRotation(4);
+
+		const twitter = goals.create(200, 1700, 'goal');
+		twitter.setData('type', 'link');
+		twitter.setData('title', 'Wisdom // Twtr');
+		twitter.setData('link', 'https://twitter.com/joemoeat');
+		twitter.body.setCircle(50);
+		twitter.setRotation(5);
+
+		const github = goals.create(1200, 1200, 'goal');
+		github.setData('type', 'link');
+		github.setData('title', 'Github');
+		github.setData('link', 'https://github.com/joemoe');
+		github.body.setCircle(50);
+		github.setRotation(6);
 
 		return goals;
 	}
