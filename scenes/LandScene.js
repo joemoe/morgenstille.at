@@ -8,6 +8,9 @@ export default class LandScene extends Phaser.Scene {
 		this.titlebar = undefined;
 		this.action = undefined;
 		this.actionLink = undefined;
+
+		this.playerTarget = undefined;
+		this.lastDist = 10000000;
 	}
 
 	preload() {
@@ -40,6 +43,8 @@ export default class LandScene extends Phaser.Scene {
 		this.cursors = this.input.keyboard.createCursorKeys();
 		this.input.keyboard.on('keydown', this.executeAction, this);
 
+		this.input.on('pointerdown', this.setPlayerGoal, this);
+
 		this.cameras.main.startFollow(this.player);
 	}
 
@@ -65,7 +70,25 @@ export default class LandScene extends Phaser.Scene {
 			velY = velY / sped * 160;
 		}
 
-		this.player.setVelocity(velX, velY)
+		if(velX != 0 || velY != 0) { 
+			this.playerTarget =  null;
+			this.lastDist = 10000000;
+		} else if(this.playerTarget) {
+			let deltaX = this.playerTarget.x - this.player.getCenter().x;
+			let deltaY = this.playerTarget.y - this.player.getCenter().y;
+			let deltaDist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+			if(this.lastDist - deltaDist < 1) {
+				this.playerTarget = null;
+				this.lastDist = 10000000;
+			} else {
+				velX = deltaX / deltaDist * 160;
+				velY = deltaY / deltaDist * 160;
+				this.lastDist = deltaDist;
+			}
+		}
+
+		this.player.setVelocity(velX, velY);
 
 		if(false && !this.player.isColliding) {
 			this.hideTitlebar();
@@ -160,6 +183,13 @@ export default class LandScene extends Phaser.Scene {
 	executeAction(obj) {
 		if(obj.keyCode == 32 && this.action == 'link') {
 			window.open(this.actionLink);
+		}
+	}
+
+	setPlayerGoal(obj) {
+		this.playerTarget = {
+			x: obj.x + this.cameras.main.scrollX,
+			y: obj.y + this.cameras.main.scrollY
 		}
 	}
 
