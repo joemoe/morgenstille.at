@@ -35,15 +35,17 @@ export default class LandScene extends Phaser.Scene {
 			align: 'left',
 			text: '//MORGENSTILLE.AT',
 			style: {
-				color: '#fdb833'
+				color: '#ffffff',
+				fontWeight: 'bold',
+				padding: 5
 			}
-		}).setScrollFactor(0);
+		}).setScrollFactor(0).setBackgroundColor('#B1740F');
 
 		this.physics.add.collider(this.player, goals, this.collideGoal, null, this);
 		this.cursors = this.input.keyboard.createCursorKeys();
 		this.input.keyboard.on('keydown', this.executeAction, this);
 
-		this.input.on('pointerdown', this.setPlayerGoal, this);
+		this.input.on('pointerup', this.setPlayerGoal, this);
 
 		this.cameras.main.startFollow(this.player);
 	}
@@ -101,42 +103,42 @@ export default class LandScene extends Phaser.Scene {
 
 		const moser = goals.create(400, 400, 'goal');
 		moser.setData('type', 'link');
-		moser.setData('title', 'Father & Son');
+		moser.setData('title', 'moser.wtf');
 		moser.setData('link', 'https://moser.wtf');
 		moser.setRotation(1);
 		moser.body.setCircle(50);
 		
 		const joemoe = goals.create(1600, 300, 'goal');
 		joemoe.setData('type', 'link');
-		joemoe.setData('title', 'Me is Joemoe');
+		joemoe.setData('title', 'joemoe.at');
 		joemoe.setData('link', 'https://joemoe.at');
 		joemoe.setRotation(2);
 		joemoe.body.setCircle(50);
 
 		const crate = goals.create(800, 700, 'goal');
 		crate.setData('type', 'link');
-		crate.setData('title', 'Managing products at Crate.io');
+		crate.setData('title', 'Product @ Crate.io');
 		crate.setData('link', 'https://crate.io');
 		crate.body.setCircle(50);
 		crate.setRotation(3);
 
 		const insta = goals.create(1700, 800, 'goal');
 		insta.setData('type', 'link');
-		insta.setData('title', 'Impressions of a live // IG');
+		insta.setData('title', 'Impressions @ IG');
 		insta.setData('link', 'https://instagram.com/joemoe');
 		insta.body.setCircle(50);
 		insta.setRotation(4);
 
 		const twitter = goals.create(200, 1700, 'goal');
 		twitter.setData('type', 'link');
-		twitter.setData('title', 'Wisdom // Twtr');
+		twitter.setData('title', 'Wisdom @ Twtr');
 		twitter.setData('link', 'https://twitter.com/joemoeat');
 		twitter.body.setCircle(50);
 		twitter.setRotation(5);
 
 		const github = goals.create(1200, 1200, 'goal');
 		github.setData('type', 'link');
-		github.setData('title', 'Github');
+		github.setData('title', 'Code @ Github');
 		github.setData('link', 'https://github.com/joemoe');
 		github.body.setCircle(50);
 		github.setRotation(6);
@@ -145,43 +147,48 @@ export default class LandScene extends Phaser.Scene {
 	}
 
 	createPlayer() {
-		const player = this.physics.add.image(200, 200, 'player');
-		player.setCollideWorldBounds(true);
-		player.setCircle(24);
-		return player;
+		return this.physics.add.image(200, 200, 'player')
+			.setCollideWorldBounds(true)
+			.setCircle(24);
 	}
 
 	createTitlebar() {
-		const titlebar = this.make.text({
+		return this.make.text({
 			x: 100,
 			y: 10,
 			align: 'center',
 			text: '//MORGENSTILLE.AT',
 			style: {
-				color: '#fdb833'
+				color: '#ffffff',
+				fontWeight: 'bold',
+				textTransform: 'uppercase',
+				padding: 5
 			}
-		});
-		return titlebar;
+		})
+			.setBackgroundColor('#1789FC')
+			.setInteractive({useHandCursor: true})
+			.on('pointerup', this.executeAction, this)
+		;
 	}
 
 	collideGoal(player, goal) {
 		var b = goal.getBounds();
-		this.showTitlebar(goal.getData('title'), b.x + b.width / 2, b.y);
+		this.showTitlebar(goal.getData('title').toUpperCase(), b.x + b.width / 2, b.y);
 		this.action = goal.getData('type');
 		this.actionLink = goal.getData('link');
 	}
 
 	showTitlebar(text, x, y) {
-		this.titlebar.setVisible(true);
-		this.titlebar.setText(text);
-		this.titlebar.setPosition(x - this.titlebar.width / 2, y - this.titlebar.height);	}
+		this.titlebar.setVisible(true)
+			.setText(text)
+			.setPosition(x - this.titlebar.width / 2, y - this.titlebar.height);	}
 
 	hideTitlebar() {
 		this.titlebar.setVisible(false);
 	}
 
 	executeAction(obj) {
-		if(obj.keyCode == 32 && this.action == 'link') {
+		if((obj.buttons || obj.keyCode && obj.keyCode == 32) && this.action == 'link') {
 			window.open(this.actionLink);
 		}
 	}
