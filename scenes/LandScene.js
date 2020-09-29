@@ -37,7 +37,7 @@ export default class LandScene extends Phaser.Scene {
 			style: {
 				color: '#fdb833'
 			}
-		});
+		}).setScrollFactor(0);
 
 		this.physics.add.collider(this.player, goals, this.collideGoal, null, this);
 		this.cursors = this.input.keyboard.createCursorKeys();
