@@ -14,7 +14,10 @@ export default class LandScene extends Phaser.Scene {
 	}
 
 	preload() {
-		this.load.image('player', 'assets/player-1.png');
+		this.load.spritesheet('player', 'assets/player-sprite.png?s', { 
+			frameWidth: 128, 
+			frameHeight: 256 
+		});
 		this.load.image('goal', 'assets/goal-1.png');
 	}
 
@@ -92,6 +95,18 @@ export default class LandScene extends Phaser.Scene {
 
 		this.player.setVelocity(velX, velY);
 
+		let isMoving = velX != 0 || velY != 0;
+
+		if(!isMoving) this.player.play('stand', true);
+		else if(velY >= 0) {
+			this.player.play('walk', true);
+			this.player.setFlipX(velX < 0);
+		} else {
+			this.player.play('walk-up', true);
+			this.player.setFlipX(velX < 0);
+		}
+		
+
 		if(false && !this.player.isColliding) {
 			this.hideTitlebar();
 			this.action = undefined;
@@ -147,9 +162,36 @@ export default class LandScene extends Phaser.Scene {
 	}
 
 	createPlayer() {
-		return this.physics.add.image(200, 200, 'player')
+		this.anims.create({
+			key: 'stand',
+			frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+			frameRate: 2,
+			repeat: -1
+		});
+
+		this.anims.create({
+			key: 'walk',
+			frames: this.anims.generateFrameNumbers('player', { start: 8, end: 15 }),
+			frameRate: 16,
+			repeat: -1
+		});
+
+		this.anims.create({
+			key: 'walk-up',
+			frames: this.anims.generateFrameNumbers('player', { start: 16, end: 23 }),
+			frameRate: 16,
+			repeat: -1
+		})
+
+		const p = this.physics.add.sprite(200, 200, 'player')
 			.setCollideWorldBounds(true)
-			.setCircle(24);
+			.setScale(0.5)
+		;
+
+		p.play('walk');
+
+		p.setBodySize(30, 200);
+		return p;
 	}
 
 	createTitlebar() {
@@ -181,7 +223,8 @@ export default class LandScene extends Phaser.Scene {
 	showTitlebar(text, x, y) {
 		this.titlebar.setVisible(true)
 			.setText(text)
-			.setPosition(x - this.titlebar.width / 2, y - this.titlebar.height);	}
+			.setPosition(x - this.titlebar.width / 2, y - this.titlebar.height);	
+	}
 
 	hideTitlebar() {
 		this.titlebar.setVisible(false);
